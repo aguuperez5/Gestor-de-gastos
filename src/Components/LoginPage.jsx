@@ -1,0 +1,73 @@
+import React, { useState, useContext } from 'react';
+import { AuthContext } from '../Components/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
+
+const LoginPage = () => {
+  const [step, setStep] = useState(1); // Paso 1: Verificar correo, Paso 2: Ingresar contraseña
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleEmailSubmit = (e) => {
+    e.preventDefault();
+
+    // Recuperar usuarios de localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const userExists = users.some((user) => user.username === email);
+
+    
+    if (userExists) {
+      setStep(2); // Avanzar al paso 2 si el usuario existe
+      setError('');
+    } else {
+      setError('El usuario no existe. ¿Quieres registrarte?');
+    }
+  };
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+
+    if (login(email, password)) {
+      navigate('/add-expense'); // Redirigir si las credenciales son correctas
+    } else {
+      setError('Contraseña incorrecta. Inténtalo de nuevo.');
+    }
+  };
+
+  return (
+    <div className="container">
+      <h1>Iniciar Sesión</h1>
+      {step === 1 && (
+        <form onSubmit={handleEmailSubmit}>
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <button type="submit">Siguiente</button>
+        </form>
+      )}
+      {step === 2 && (
+        <form onSubmit={handlePasswordSubmit}>
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button type="submit">Iniciar Sesión</button>
+        </form>
+      )}
+      {error && <p className="error">{error}</p>}
+      {step === 1 && (
+        <p>
+          ¿No tienes una cuenta? <Link to="/register">Regístrate aquí</Link>
+        </p>
+      )}
+    </div>
+  );
+};
+
+export default LoginPage;
