@@ -3,21 +3,20 @@ import { AuthContext } from '../Components/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
 const LoginPage = () => {
-  const [step, setStep] = useState(1); // Paso 1: Verificar correo, Paso 2: Ingresar contraseña
-  const [email, setEmail] = useState('');
+  const [step, setStep] = useState(1); // Paso 1: Verificar usuario, Paso 2: Ingresar contraseña
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleEmailSubmit = (e) => {
+  const handleUsernameSubmit = (e) => {
     e.preventDefault();
 
     // Recuperar usuarios de localStorage
     const users = JSON.parse(localStorage.getItem('users')) || [];
-    const userExists = users.some((user) => user.username === email);
+    const userExists = users.some((user) => user.username === username);
 
-    
     if (userExists) {
       setStep(2); // Avanzar al paso 2 si el usuario existe
       setError('');
@@ -25,11 +24,12 @@ const LoginPage = () => {
       setError('El usuario no existe. ¿Quieres registrarte?');
     }
   };
+
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
 
-    if (login(email, password)) {
-      navigate('/add-expense'); // Redirigir si las credenciales son correctas
+    if (login(username, password)) {
+      navigate('/menu'); // Redirigir si las credenciales son correctas
     } else {
       setError('Contraseña incorrecta. Inténtalo de nuevo.');
     }
@@ -39,12 +39,12 @@ const LoginPage = () => {
     <div className="container">
       <h1>Iniciar Sesión</h1>
       {step === 1 && (
-        <form onSubmit={handleEmailSubmit}>
+        <form onSubmit={handleUsernameSubmit}>
           <input
-            type="email"
-            placeholder="Correo electrónico"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="Usuario"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <button type="submit">Siguiente</button>
         </form>
